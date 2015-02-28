@@ -33,10 +33,12 @@ public class MainActivity extends ActionBarActivity {
         //field = (EditText)findViewById(R.id.urlField);
         browser = (WebView)findViewById(R.id.webView);
         browser.setWebViewClient(new MyBrowser());
+        open();
     }
 
-    public void open(View view){
+    public void open(){
         String url = "http://192.168.42.1:8080";
+        //String url = "http://www.parked.com/";
         browser.getSettings().setLoadsImagesAutomatically(true);
         browser.getSettings().setJavaScriptEnabled(true);
         browser.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
