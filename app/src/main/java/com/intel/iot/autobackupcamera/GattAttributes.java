@@ -27,8 +27,8 @@ public class GattAttributes {
     public static String BATTERY_MEASUREMENT = "00002904-0000-1000-8000-00805f9b34fb";
     public static String DEVICE_NAME = "00002a00-0000-1000-8000-00805f9b34fb";
     public static String APPEARANCE = "00002a01-0000-1000-8000-00805f9b34fb";
-    public static String ACTIVATE_CAMERA = "ffffffff-ffff-ffff-ffff-fffffffffff2";
-    public static String TEST = "ffffffff-ffff-ffff-ffff-fffffffffff1";
+    public static String ACTIVATE_CAMERA = "f8b67f8a-d10e-4c29-bab7-b604f681bf41";
+    //public static String TEST = "ffffffff-ffff-ffff-ffff-fffffffffff1";
     //public static String HEART_RATE_MEASUREMENT = "00002a37-0000-1000-8000-00805f9b34fb";
     //public static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
 
@@ -44,7 +44,7 @@ public class GattAttributes {
         attributes.put(APPEARANCE, "Appearance");
         attributes.put(ACTIVATE_CAMERA, "Activate Camera");
         attributes.put(BATTERY_MEASUREMENT, "Battery Measurement");
-        attributes.put(TEST, "TEST");
+        //attributes.put(TEST, "TEST");
         //attributes.put("00002a29-0000-1000-8000-00805f9b34fb", "Manufacturer Name String");
     }
 

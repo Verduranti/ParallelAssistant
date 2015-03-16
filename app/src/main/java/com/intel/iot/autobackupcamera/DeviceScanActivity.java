@@ -165,15 +165,18 @@ public class DeviceScanActivity extends ListActivity {
                 public void run() {
                     mScanning = false;
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    //mBluetoothAdapter.startDiscovery();
                     invalidateOptionsMenu();
                 }
             }, SCAN_PERIOD);
 
             mScanning = true;
             mBluetoothAdapter.startLeScan(mLeScanCallback);
+            //mBluetoothAdapter.startDiscovery();
         } else {
             mScanning = false;
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            //mBluetoothAdapter.cancelDiscovery();
         }
         invalidateOptionsMenu();
     }
