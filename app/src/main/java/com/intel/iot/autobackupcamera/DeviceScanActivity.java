@@ -35,7 +35,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 
 /**
@@ -49,7 +48,7 @@ public class DeviceScanActivity extends ListActivity {
 
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
-    private static final long SCAN_PERIOD = 40000;
+    private static final long SCAN_PERIOD = 10000;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -166,18 +165,15 @@ public class DeviceScanActivity extends ListActivity {
                 public void run() {
                     mScanning = false;
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                    //mBluetoothAdapter.startDiscovery();
                     invalidateOptionsMenu();
                 }
             }, SCAN_PERIOD);
 
             mScanning = true;
             mBluetoothAdapter.startLeScan(mLeScanCallback);
-            //mBluetoothAdapter.startDiscovery();
         } else {
             mScanning = false;
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
-            //mBluetoothAdapter.cancelDiscovery();
         }
         invalidateOptionsMenu();
     }

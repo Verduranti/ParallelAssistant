@@ -22,7 +22,7 @@ import java.util.HashMap;
  * This class includes a small subset of standard GATT attributes for demonstration purposes.
  */
 public class GattAttributes {
-    private static HashMap<String, String> attributes = new HashMap();
+    private static HashMap<String, String> attributes = new HashMap<>();
     public static String BATTERY_LEVEL = "00002a19-0000-1000-8000-00805f9b34fb";
     public static String BATTERY_MEASUREMENT = "00002904-0000-1000-8000-00805f9b34fb";
     public static String DEVICE_NAME = "00002a00-0000-1000-8000-00805f9b34fb";
