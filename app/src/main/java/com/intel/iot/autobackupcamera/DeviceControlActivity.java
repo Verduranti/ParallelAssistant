@@ -127,7 +127,7 @@ public class DeviceControlActivity extends Activity {
                 //What to do with data
 
                 //Needed to change something about how to connect to peers
-                //discoverPeers(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+                discoverPeers(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
         }
     };
@@ -142,7 +142,7 @@ public class DeviceControlActivity extends Activity {
 
                     @Override
                     public void run() {
-                        connect("fe:c2:de:35:ef:4d", pin);
+                        connect("fe:c2:de:35:ef:4d");
                     }
                 }, 0);
 
@@ -157,15 +157,16 @@ public class DeviceControlActivity extends Activity {
 
     }
 
-    public void connect(String address, String pin)
+    public void connect(String address)
     {
-        System.out.println("Connecting to "+address+" with "+pin);
+        System.out.println("Connecting to "+address);
 
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = address;
-        config.wps.setup = WpsInfo.KEYPAD;
-        config.wps.pin = pin;
-        config.groupOwnerIntent = 0;
+        //config.wps.setup = WpsInfo.KEYPAD;
+        //config.wps.pin = pin;
+        config.wps.setup = WpsInfo.PBC;
+        config.groupOwnerIntent = 15;
         mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
