@@ -25,7 +25,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.net.wifi.WpsInfo;
+import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
@@ -34,6 +38,7 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +66,11 @@ public class DeviceControlActivity extends Activity {
     private boolean mConnected = false;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
 
+
+    private WifiP2pManager.Channel mChannel;
+    private WifiP2pManager mManager;
+    //private BroadcastReceiver mWifiReceiver;
+
     private final String LIST_NAME = "NAME";
     private final String LIST_UUID = "UUID";
 
@@ -75,7 +85,13 @@ public class DeviceControlActivity extends Activity {
                 finish();
             }
             // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
+            DeviceControlActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mBluetoothLeService.connect(mDeviceAddress);
+                }
+            });
+            //mBluetoothLeService.connect(mDeviceAddress);
         }
 
         @Override
@@ -108,13 +124,69 @@ public class DeviceControlActivity extends Activity {
                 displayGattServices(mBluetoothLeService.getSupportedGattServices());
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+                //What to do with data
+
+                //Needed to change something about how to connect to peers
+                //discoverPeers(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
         }
     };
 
-    // If a given GATT characteristic is selected, check for supported features.  This sample
-    // demonstrates 'Read' and 'Notify' features.  See
-    // http://d.android.com/reference/android/bluetooth/BluetoothGatt.html for the complete
+    private void discoverPeers(final String pin) {
+        System.out.println("Test: " + mChannel.toString());
+        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                System.out.println("Discover Peers Succeeded!");
+                new Handler().postDelayed(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        connect("fe:c2:de:35:ef:4d", pin);
+                    }
+                }, 0);
+
+            }
+
+            @Override
+            public void onFailure(int reasonCode) {
+                System.out.println("Discover Peers failed with error code: "
+                        + reasonCode);
+            }
+        });
+
+    }
+
+    public void connect(String address, String pin)
+    {
+        System.out.println("Connecting to "+address+" with "+pin);
+
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = address;
+        config.wps.setup = WpsInfo.KEYPAD;
+        config.wps.pin = pin;
+        config.groupOwnerIntent = 0;
+        mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                System.out.println("Succeeded in connection");
+                //NetworkInfo networkInfo = getIntent().getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
+                //System.out.println(networkInfo.toString());
+                //Intent i = new Intent(DeviceControlActivity.this, MainActivity.class);
+                //startActivity(i);
+                // close this activity
+                //finish();
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                System.out.println("Connection failed try again -> " + reason);
+            }
+        });
+    }
+
+    // If a given GATT characteristic is selected, check for supported features.
+    // See http://d.android.com/reference/android/bluetooth/BluetoothGatt.html for the complete
     // list of supported characteristic features.
     private final ExpandableListView.OnChildClickListener servicesListClickListener =
             new ExpandableListView.OnChildClickListener() {
@@ -125,7 +197,9 @@ public class DeviceControlActivity extends Activity {
                         final BluetoothGattCharacteristic characteristic =
                                 mGattCharacteristics.get(groupPosition).get(childPosition);
                         final int charaProp = characteristic.getProperties();
-                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
+                        //System.out.println(charaProp);
+                        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
+                            System.out.println("Reading! " + characteristic.getUuid());
                             // If there is an active notification on a characteristic, clear
                             // it first so it doesn't update the data field on the user interface.
                             if (mNotifyCharacteristic != null) {
@@ -136,7 +210,27 @@ public class DeviceControlActivity extends Activity {
                             mBluetoothLeService.readCharacteristic(characteristic);
                         }
 
-                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                        //Todo: flagging this
+//                        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE) > 0) {
+//                            System.out.println("Writing! " + characteristic.getUuid());
+//                            // If there is an active notification on a characteristic, clear
+//                            // it first so it doesn't update the data field on the user interface.
+//                            if (mNotifyCharacteristic != null) {
+//                                mBluetoothLeService.setCharacteristicNotification(
+//                                        mNotifyCharacteristic, false);
+//                                mNotifyCharacteristic = null;
+//                            }
+//                            for(BluetoothGattDescriptor desc : characteristic.getDescriptors()){
+//
+//                            }
+//                            BluetoothGattDescriptor desc = characteristic.getDescriptor(UUID.fromString(GattAttributes.ADDRESS_DESCRIPTOR));
+//                            final String address = "14:1a:a3:63:d4:d3";
+//                            desc.setValue(address.getBytes());
+//                            mBluetoothLeService.writeCharacteristic(characteristic);
+//                        }
+
+                        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                            System.out.println("Notifying");
                             mNotifyCharacteristic = characteristic;
                             mBluetoothLeService.setCharacteristicNotification(
                                     characteristic, true);
@@ -156,6 +250,10 @@ public class DeviceControlActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gatt_services_characteristics);
+
+        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+        //mWifiReceiver = new WifiDirectBroadcastReceiver(mManager, mChannel);
 
         final Intent intent = getIntent();
         mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
@@ -177,6 +275,7 @@ public class DeviceControlActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(mDeviceAddress);
@@ -258,7 +357,7 @@ public class DeviceControlActivity extends Activity {
         for (BluetoothGattService gattService : gattServices) {
             HashMap<String, String> currentServiceData = new HashMap<>();
             uuid = gattService.getUuid().toString();
-            System.out.println("Service: " + uuid);
+            //System.out.println("Service: " + uuid);
             currentServiceData.put(
                     LIST_NAME, GattAttributes.lookup(uuid, unknownServiceString));
             currentServiceData.put(LIST_UUID, uuid);
@@ -276,7 +375,7 @@ public class DeviceControlActivity extends Activity {
                 charas.add(gattCharacteristic);
                 HashMap<String, String> currentCharaData = new HashMap<>();
                 uuid = gattCharacteristic.getUuid().toString();
-                System.out.println("Charas: " + uuid);
+                //System.out.println("Charas: " + uuid);
                 currentCharaData.put(
                         LIST_NAME, GattAttributes.lookup(uuid, unknownCharaString));
                 currentCharaData.put(LIST_UUID, uuid);

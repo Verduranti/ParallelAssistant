@@ -22,13 +22,13 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -65,6 +65,10 @@ public class BluetoothLeService extends Service {
 
     public final static UUID UUID_BATTERY_LEVEL =
             UUID.fromString(GattAttributes.BATTERY_LEVEL);
+    public final static UUID UUID_ACTIVATE_CAMERA =
+            UUID.fromString(GattAttributes.ACTIVATE_CAMERA);
+    //public final static UUID UUID_ACTIVATE_CAMERA2 =
+    //        UUID.fromString(GattAttributes.ACTIVATE_CAMERA2);
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
@@ -102,6 +106,7 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
+            System.out.println("Read status: " + status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
             }
@@ -140,8 +145,14 @@ public class BluetoothLeService extends Service {
             final int heartRate = characteristic.getIntValue(format, 0);
             Log.d(TAG, String.format("Battery level currently at: %d %%", heartRate));
             intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
+        } else if (UUID_ACTIVATE_CAMERA.equals(characteristic.getUuid())) {
+            final String value = characteristic.getStringValue(0);
+            //System.out.println(value);
+            intent.putExtra(EXTRA_DATA, value);
+
         } else {
             // For all other profiles, writes the data formatted in HEX.
+            System.out.println("Processing " + characteristic.getUuid());
             final byte[] data = characteristic.getValue();
             if (data != null && data.length > 0) {
                 final StringBuilder stringBuilder = new StringBuilder(data.length);
@@ -235,7 +246,8 @@ public class BluetoothLeService extends Service {
         }
         // We want to directly connect to the device, so we are setting the autoConnect
         // parameter to false.
-        mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
+        //mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
+        mBluetoothGatt = device.connectGatt(this, true, mGattCallback);
         Log.d(TAG, "Trying to create a new connection.");
         mBluetoothDeviceAddress = address;
         mConnectionState = STATE_CONNECTING;
@@ -254,6 +266,16 @@ public class BluetoothLeService extends Service {
             return;
         }
         mBluetoothGatt.disconnect();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                mBluetoothGatt.close();
+
+            }
+        }, 0);
+        //mBluetoothGatt.close();
     }
 
     /**
@@ -284,6 +306,21 @@ public class BluetoothLeService extends Service {
     }
 
     /**
+     * Request a write on a given {@code BluetoothGattCharacteristic}. The write result is reported
+     * asynchronously through the {@code BluetoothGattCallback#onCharacteristicWrite(android.bluetooth.BluetoothGatt, android.bluetooth.BluetoothGattCharacteristic, int)}
+     * callback.
+     *
+     * @param characteristic The characteristic to write to.
+     */
+    public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+            Log.w(TAG, "BluetoothAdapter not initialized");
+            return;
+        }
+        mBluetoothGatt.writeCharacteristic(characteristic);
+    }
+
+    /**
      * Enables or disables notification on a give characteristic.
      *
      * @param characteristic Characteristic to act on.
@@ -298,12 +335,12 @@ public class BluetoothLeService extends Service {
         mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
 
         // This is specific to Heart Rate Measurement.
-        if (UUID_BATTERY_LEVEL.equals(characteristic.getUuid())) {
-            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
-                    UUID.fromString(GattAttributes.BATTERY_MEASUREMENT));
-            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            mBluetoothGatt.writeDescriptor(descriptor);
-        }
+//        if (UUID_BATTERY_LEVEL.equals(characteristic.getUuid())) {
+//            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
+//                    UUID.fromString(GattAttributes.BATTERY_MEASUREMENT));
+//            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+//            mBluetoothGatt.writeDescriptor(descriptor);
+//        }
     }
 
     /**

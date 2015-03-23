@@ -1,8 +1,8 @@
 package com.intel.iot.autobackupcamera;
 
+import android.app.Activity;
 import android.media.MediaExtractor;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,7 +10,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
     //private EditText field;
     private WebView browser;

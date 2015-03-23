@@ -8,73 +8,68 @@ import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
-import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.ActionListener;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
-import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
+import android.os.Handler;
 
 
 public class WifiDirectBroadcastReceiver extends BroadcastReceiver {
-
     private WifiP2pManager mManager;
     private Channel mChannel;
-    private WifiDirectActivity mActivity;
     private DirectWifiPeersListener myPeerListListener;
-    private DirectWifiConnectionInfoListener myConnectionInfoListener;
-    private static boolean alreadyCreatedActivity;
 
-    int numberOfConnections;
-
-    public WifiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel, WifiDirectActivity activity) {
+    public WifiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel) {
         super();
+
         this.mManager = manager;
         this.mChannel = channel;
-        System.out.println(mChannel);
-        this.mActivity = activity;
         this.myPeerListListener = new DirectWifiPeersListener();
-        this.myConnectionInfoListener = new DirectWifiConnectionInfoListener();
-        this.numberOfConnections = 0;
-        this.alreadyCreatedActivity = false;
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
         String action = intent.getAction();
-        System.out.println("In On Received " + action);
-
 
         if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
             int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
             if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
                 System.out.println("WIFI Enabled");
-                discoverPeers();
+                discoverPeers(); // 1
             } else {
                 System.out.println("Wifi disabled!");
             }
-        } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
-            mManager.requestPeers(mChannel, myPeerListListener);
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
-
-            connectionChanged(intent);
+            connectionChanged(intent); // 2
             // Respond to new connection or disconnections
+        } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
+            //connect("fe:c2:de:35:ef:4d", "90583483");
+            mManager.requestPeers(mChannel, myPeerListListener); // 3
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
             // Respond to this device's wifi state changing
         }
     }
 
     private void discoverPeers() {
+        System.out.println("Test: " + mChannel.toString());
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                System.out.println("Succeded!");
+                System.out.println("Discover Peers Succeeded!");
+                new Handler().postDelayed(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        connect("fe:c2:de:35:ef:4d", "14168314");
+
+                    }
+                }, 0);
             }
 
             @Override
             public void onFailure(int reasonCode) {
-                System.out.println("failed with error code: "
+                System.out.println("Discover Peers failed with error code: "
                         + reasonCode);
             }
         });
@@ -91,10 +86,11 @@ public class WifiDirectBroadcastReceiver extends BroadcastReceiver {
             return;
         }
         if (networkInfo.isConnected()) {
-            mManager.requestConnectionInfo(mChannel, myConnectionInfoListener);
+            //mManager.requestConnectionInfo(mChannel, myConnectionInfoListener);
+            System.out.println(networkInfo.toString());
         } else {
             // It's a disconnect
-            System.out.println("someone disconnected");
+            System.out.println(networkInfo.toString());
         }
 
     }
@@ -112,51 +108,48 @@ public class WifiDirectBroadcastReceiver extends BroadcastReceiver {
             System.out.println("Found peers");
             //Toast.makeText(mActivity, "found peers", Toast.LENGTH_LONG).show();
             for (WifiP2pDevice peer : peers.getDeviceList()) {
-                WifiP2pConfig config = new WifiP2pConfig();
-                config.deviceAddress = peer.deviceAddress;
-                config.wps.setup = WpsInfo.PBC;
-                mManager.connect(mChannel, config, new ConnectionActionListener(config));
+                System.out.println(peer.deviceAddress);
+//                WifiP2pConfig config = new WifiP2pConfig();
+//                config.deviceAddress = peer.deviceAddress;
+//                config.wps.setup = WpsInfo.KEYPAD;
+//                config.wps.pin = "90583483";
+//                mManager.connect(mChannel, config, new ActionListener() {
+//                    @Override
+//                    public void onSuccess() {
+//                        System.out.println("succeeded in connection");
+//                    }
+//
+//                    @Override
+//                    public void onFailure(int reason) {
+//                        System.out.println("fail try again");
+//                    }
+//                });
+                connect(peer.deviceAddress, "14168314");
             }
         }
 
 
     }
 
-    private class ConnectionActionListener implements ActionListener {
-        WifiP2pConfig config;
+    public void connect(String address, String pin)
+    {
+        System.out.println("Connecting to "+address+" with "+pin);
 
-        public ConnectionActionListener(WifiP2pConfig config) {
-            this.config = config;
-        }
-
-        @Override
-        public void onSuccess() {
-            System.out.println("succeeded in connection");
-        }
-
-        @Override
-        public void onFailure(int reason) {
-            System.out.println("fail try again");
-            //mManager.connect(mChannel, config, new ConnectionActionListener(config));
-        }
-    }
-
-    public class DirectWifiConnectionInfoListener implements ConnectionInfoListener {
-
-        @Override
-        public void onConnectionInfoAvailable(WifiP2pInfo info) {
-            System.out.println("In connection info available");
-
-            if (info.groupFormed && info.isGroupOwner) {
-                //Intent intent = new Intent(mActivity, SearchActivity.class);
-                //intent.putExtra("info",info);
-                //mActivity.startActivity(intent);
-            } else if (info.groupFormed) {
-                //Intent intent = new Intent(mActivity, WaitingActivity.class);
-                //intent.putExtra("info",info);
-                //mActivity.startActivity(intent);
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = address;
+        //config.wps.setup = WpsInfo.KEYPAD;
+        config.wps.setup = WpsInfo.LABEL;
+        config.wps.pin = pin;
+        mManager.connect(mChannel, config, new ActionListener() {
+            @Override
+            public void onSuccess() {
+                System.out.println("Succeeded in connection");
             }
-        }
 
+            @Override
+            public void onFailure(int reason) {
+                System.out.println("Connection failed try again -> "+reason);
+            }
+        });
     }
 }

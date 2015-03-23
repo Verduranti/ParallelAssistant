@@ -21,47 +21,59 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WpsInfo;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.os.Bundle;
 
-/**
- * For a given BLE device, this Activity provides the user interface to connect, display data,
- * and display GATT services and characteristics supported by the device.  The Activity
- * communicates with {@code BluetoothLeService}, which in turn interacts with the
- * Bluetooth LE API.
- */
 public class WifiDirectActivity extends Activity {
 
-    Channel mChannel;
-    WifiP2pManager mManager;
-
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
-    //                        or notification operations.
+    private Channel mChannel;
+    private WifiP2pManager mManager;
     private BroadcastReceiver mWifiReceiver;
 
-    //@Override
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gatt_services_characteristics);
 
         final Intent intent = getIntent();
 
-        final WifiP2pManager mManager =
-                (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        WifiP2pManager.Channel mChannel = mManager.initialize(this, getMainLooper(), null);
+        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        //System.out.println("WIfi Manager set here: " + mManager.toString());
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+        mWifiReceiver = new WifiDirectBroadcastReceiver(mManager, mChannel);
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mWifiReceiver = new WifiDirectBroadcastReceiver(mManager, mChannel, this);
+        //connect("fe:c2:de:35:ef:4d", "90583483");
+        //System.out.println("Wifi Broadcast set here: " + mWifiReceiver.toString());
+        //mWifiReceiver = new WifiDirectBroadcastReceiver(mManager, mChannel);
         registerReceiver(mWifiReceiver, makeWifiDirectIntentFilter());
+    }
+
+    public void connect(String address, String pin)
+    {
+        System.out.println("Connecting to "+address+" with "+pin);
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = address;
+        config.wps.setup = WpsInfo.KEYPAD;
+        config.wps.pin = pin;
+        mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                System.out.println("Succeeded in connection");
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                System.out.println("Connection failed try again -> " + reason);
+            }
+        });
     }
 
     @Override
