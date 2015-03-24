@@ -125,7 +125,7 @@ public class DeviceControlActivity extends Activity {
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
                 //What to do with data
-
+                if(intent.getIntExtra(BluetoothLeService.EXTRA_NAME))
                 //Needed to change something about how to connect to peers
                 discoverPeers(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
@@ -166,7 +166,7 @@ public class DeviceControlActivity extends Activity {
         //config.wps.setup = WpsInfo.KEYPAD;
         //config.wps.pin = pin;
         config.wps.setup = WpsInfo.PBC;
-        config.groupOwnerIntent = 15;
+        config.groupOwnerIntent = 0;
         mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {

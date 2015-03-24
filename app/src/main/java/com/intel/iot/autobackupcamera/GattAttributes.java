@@ -27,8 +27,8 @@ public class GattAttributes {
     public static String BATTERY_MEASUREMENT = "00002904-0000-1000-8000-00805f9b34fb";
     public static String DEVICE_NAME = "00002a00-0000-1000-8000-00805f9b34fb";
     public static String APPEARANCE = "00002a01-0000-1000-8000-00805f9b34fb";
-    public static String ACTIVATE_CAMERA = "f8b67f8a-d10e-4c29-bab7-b604f681bf41";
-    public static String ACTIVATE_CAMERA2 = "e3251ee6-922e-44a7-8b35-4438bfc8a5f5";
+    public static String ACTIVATE_WIFI = "f8b67f8a-d10e-4c29-bab7-b604f681bf41";
+    public static String ACTIVATE_CAMERA = "e3251ee6-922e-44a7-8b35-4438bfc8a5f5";
 
     public static String ADDRESS_DESCRIPTOR = "e3251ee6-922e-44a7-8b35-4438bfc8a5f6";
     //public static String TEST = "ffffffff-ffff-ffff-ffff-fffffffffff1";
@@ -45,8 +45,8 @@ public class GattAttributes {
         attributes.put(BATTERY_LEVEL, "Battery Level");
         attributes.put(DEVICE_NAME, "Device Name");
         attributes.put(APPEARANCE, "Appearance");
-        attributes.put(ACTIVATE_CAMERA, "Activate Camera");
-        attributes.put(ACTIVATE_CAMERA2, "Activate Camera 2");
+        attributes.put(ACTIVATE_WIFI, "Activate Camera");
+        attributes.put(ACTIVATE_CAMERA, "Activate Camera 2");
         attributes.put(BATTERY_MEASUREMENT, "Battery Measurement");
 
         //Descriptors.

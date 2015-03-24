@@ -62,13 +62,16 @@ public class BluetoothLeService extends Service {
             "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
     public final static String EXTRA_DATA =
             "com.example.bluetooth.le.EXTRA_DATA";
+    public final static String EXTRA_NAME =
+            "com.example.bluetooth.le.EXTRA_NAME";
+
 
     public final static UUID UUID_BATTERY_LEVEL =
             UUID.fromString(GattAttributes.BATTERY_LEVEL);
     public final static UUID UUID_ACTIVATE_CAMERA =
             UUID.fromString(GattAttributes.ACTIVATE_CAMERA);
-    //public final static UUID UUID_ACTIVATE_CAMERA2 =
-    //        UUID.fromString(GattAttributes.ACTIVATE_CAMERA2);
+    public final static UUID UUID_ACTIVATE_WIFI =
+            UUID.fromString(GattAttributes.ACTIVATE_WIFI);
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
@@ -147,8 +150,13 @@ public class BluetoothLeService extends Service {
             intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
         } else if (UUID_ACTIVATE_CAMERA.equals(characteristic.getUuid())) {
             final String value = characteristic.getStringValue(0);
-            //System.out.println(value);
             intent.putExtra(EXTRA_DATA, value);
+            intent.putExtra(EXTRA_NAME, 0);
+
+        } else if (UUID_ACTIVATE_WIFI.equals(characteristic.getUuid())) {
+            final String value = characteristic.getStringValue(0);
+            intent.putExtra(EXTRA_DATA, value);
+            intent.putExtra(EXTRA_DATA, 1);
 
         } else {
             // For all other profiles, writes the data formatted in HEX.
