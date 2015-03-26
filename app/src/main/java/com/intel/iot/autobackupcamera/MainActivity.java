@@ -37,8 +37,9 @@ public class MainActivity extends Activity {
     }
 
     public void open(){
-        //String url = "http://192.168.42.1:8080";
-        String url = "http://192.168.42.1/";
+        //String url = "http://192.168.1.6/";
+        String url = "http://192.168.42.1:8080";
+        //String url = "http://192.168.42.1/";
         browser.getSettings().setLoadsImagesAutomatically(true);
         browser.getSettings().setJavaScriptEnabled(true);
         browser.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);

@@ -32,6 +32,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.UUID;
 
@@ -109,7 +110,7 @@ public class BluetoothLeService extends Service {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
-            System.out.println("Read status: " + status);
+            Log.i(TAG, "Read status: " + status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
             }
@@ -151,12 +152,12 @@ public class BluetoothLeService extends Service {
         } else if (UUID_ACTIVATE_CAMERA.equals(characteristic.getUuid())) {
             final String value = characteristic.getStringValue(0);
             intent.putExtra(EXTRA_DATA, value);
-            intent.putExtra(EXTRA_NAME, 0);
+            intent.putExtra(EXTRA_NAME, 1);
 
         } else if (UUID_ACTIVATE_WIFI.equals(characteristic.getUuid())) {
             final String value = characteristic.getStringValue(0);
             intent.putExtra(EXTRA_DATA, value);
-            intent.putExtra(EXTRA_DATA, 1);
+            intent.putExtra(EXTRA_NAME, 0);
 
         } else {
             // For all other profiles, writes the data formatted in HEX.
@@ -256,6 +257,7 @@ public class BluetoothLeService extends Service {
         // parameter to false.
         //mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
         mBluetoothGatt = device.connectGatt(this, true, mGattCallback);
+        refreshDeviceCache(mBluetoothGatt); //Glorious!
         Log.d(TAG, "Trying to create a new connection.");
         mBluetoothDeviceAddress = address;
         mConnectionState = STATE_CONNECTING;
@@ -359,7 +361,21 @@ public class BluetoothLeService extends Service {
      */
     public List<BluetoothGattService> getSupportedGattServices() {
         if (mBluetoothGatt == null) return null;
-
         return mBluetoothGatt.getServices();
+    }
+
+    private boolean refreshDeviceCache(BluetoothGatt gatt){
+        try {
+            BluetoothGatt localBluetoothGatt = gatt;
+            Method localMethod = localBluetoothGatt.getClass().getMethod("refresh", new Class[0]);
+            if (localMethod != null) {
+                boolean bool = ((Boolean) localMethod.invoke(localBluetoothGatt, new Object[0])).booleanValue();
+                return bool;
+            }
+        }
+        catch (Exception localException) {
+            Log.e(TAG, "An exception occured while refreshing device");
+        }
+        return false;
     }
 }

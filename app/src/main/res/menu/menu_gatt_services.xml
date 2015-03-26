@@ -7,6 +7,11 @@
         android:orderInCategory="1"
         android:showAsAction="ifRoom"
         app:showAsAction="ifRoom"/>
+    <item android:id="@+id/menu_go"
+        android:title="@string/menu_go"
+        android:orderInCategory="30"
+        android:showAsAction="ifRoom|withText"
+        app:showAsAction="ifRoom|withText"/>
     <item android:id="@+id/menu_connect"
         android:title="@string/menu_connect"
         android:orderInCategory="50"

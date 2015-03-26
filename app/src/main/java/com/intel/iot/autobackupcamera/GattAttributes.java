@@ -45,8 +45,8 @@ public class GattAttributes {
         attributes.put(BATTERY_LEVEL, "Battery Level");
         attributes.put(DEVICE_NAME, "Device Name");
         attributes.put(APPEARANCE, "Appearance");
-        attributes.put(ACTIVATE_WIFI, "Activate Camera");
-        attributes.put(ACTIVATE_CAMERA, "Activate Camera 2");
+        attributes.put(ACTIVATE_WIFI, "Activate Wifi");
+        attributes.put(ACTIVATE_CAMERA, "Activate Camera");
         attributes.put(BATTERY_MEASUREMENT, "Battery Measurement");
 
         //Descriptors.

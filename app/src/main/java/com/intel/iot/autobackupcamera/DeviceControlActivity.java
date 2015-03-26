@@ -66,10 +66,10 @@ public class DeviceControlActivity extends Activity {
     private boolean mConnected = false;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
 
-
+    //Wifi Direct classes
     private WifiP2pManager.Channel mChannel;
     private WifiP2pManager mManager;
-    //private BroadcastReceiver mWifiReceiver;
+
 
     private final String LIST_NAME = "NAME";
     private final String LIST_UUID = "UUID";
@@ -125,63 +125,78 @@ public class DeviceControlActivity extends Activity {
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
                 //What to do with data
-                if(intent.getIntExtra(BluetoothLeService.EXTRA_NAME))
-                //Needed to change something about how to connect to peers
-                discoverPeers(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+                int test = intent.getIntExtra(BluetoothLeService.EXTRA_NAME, -1);
+                if(test == 0 || test == 1)
+                {
+                    System.out.println("Try to connect");
+                    //0: This is where we told the app to activate wifi P2P
+                    //1: Where we told the board to try and connect with us
+                    //-1: anything else
+                    discoverPeers();
+                }
+                else {
+                    //Do nothing for now
+                }
+
             }
         }
     };
 
-    private void discoverPeers(final String pin) {
+    private void discoverPeers() {
         System.out.println("Test: " + mChannel.toString());
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                System.out.println("Discover Peers Succeeded!");
+                Log.i(TAG, "Discover Peers Succeeded!");
                 new Handler().postDelayed(new Runnable() {
-
                     @Override
                     public void run() {
-                        connect("fe:c2:de:35:ef:4d");
+                        //connect("fe:c2:de:35:ef:4d"); //sapphire
+                        connect("7a:4b:87:ac:9b:de"); //rainier
                     }
                 }, 0);
-
             }
-
             @Override
             public void onFailure(int reasonCode) {
-                System.out.println("Discover Peers failed with error code: "
+                Log.e(TAG, "Discover Peers failed with error code: "
                         + reasonCode);
+                //if(reasonCode != 2)
+                //    return;
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //connect("fe:c2:de:35:ef:4d"); //sapphire
+                        connect("7a:4b:87:ac:9b:de"); //rainier
+                    }
+                }, 0);
             }
         });
-
     }
 
     public void connect(String address)
     {
         System.out.println("Connecting to "+address);
-
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = address;
-        //config.wps.setup = WpsInfo.KEYPAD;
-        //config.wps.pin = pin;
         config.wps.setup = WpsInfo.PBC;
-        config.groupOwnerIntent = 0;
+        //config.groupOwnerIntent = 0;
         mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                System.out.println("Succeeded in connection");
+                //If we get here that means we succeeded in connecting with the edison
+                //This will start the camera activity and close the connection activity
+                Log.i(TAG, "Succeeded in connection");
                 //NetworkInfo networkInfo = getIntent().getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
                 //System.out.println(networkInfo.toString());
-                //Intent i = new Intent(DeviceControlActivity.this, MainActivity.class);
-                //startActivity(i);
+                Intent i = new Intent(DeviceControlActivity.this, MainActivity.class);
+                startActivity(i);
                 // close this activity
                 //finish();
             }
 
             @Override
             public void onFailure(int reason) {
-                System.out.println("Connection failed try again -> " + reason);
+                Log.e(TAG, "Connection failed try again -> " + reason);
             }
         });
     }
@@ -200,7 +215,7 @@ public class DeviceControlActivity extends Activity {
                         final int charaProp = characteristic.getProperties();
                         //System.out.println(charaProp);
                         if ((charaProp & BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
-                            System.out.println("Reading! " + characteristic.getUuid());
+                            Log.i(TAG, "Reading! " + characteristic.getUuid());
                             // If there is an active notification on a characteristic, clear
                             // it first so it doesn't update the data field on the user interface.
                             if (mNotifyCharacteristic != null) {
@@ -211,11 +226,11 @@ public class DeviceControlActivity extends Activity {
                             mBluetoothLeService.readCharacteristic(characteristic);
                         }
 
-                        //Todo: flagging this
-//                        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE) > 0) {
-//                            System.out.println("Writing! " + characteristic.getUuid());
-//                            // If there is an active notification on a characteristic, clear
-//                            // it first so it doesn't update the data field on the user interface.
+                        //Todo: flagging this for write types to be added later
+                        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE) > 0) {
+                            Log.i(TAG, "Writing! " + characteristic.getUuid());
+                            // If there is an active notification on a characteristic, clear
+                            // it first so it doesn't update the data field on the user interface.
 //                            if (mNotifyCharacteristic != null) {
 //                                mBluetoothLeService.setCharacteristicNotification(
 //                                        mNotifyCharacteristic, false);
@@ -228,10 +243,9 @@ public class DeviceControlActivity extends Activity {
 //                            final String address = "14:1a:a3:63:d4:d3";
 //                            desc.setValue(address.getBytes());
 //                            mBluetoothLeService.writeCharacteristic(characteristic);
-//                        }
-
+                        }
                         if ((charaProp & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-                            System.out.println("Notifying");
+                            Log.i(TAG, "Notifying");
                             mNotifyCharacteristic = characteristic;
                             mBluetoothLeService.setCharacteristicNotification(
                                     characteristic, true);
@@ -254,7 +268,6 @@ public class DeviceControlActivity extends Activity {
 
         mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         mChannel = mManager.initialize(this, getMainLooper(), null);
-        //mWifiReceiver = new WifiDirectBroadcastReceiver(mManager, mChannel);
 
         final Intent intent = getIntent();
         mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
@@ -299,13 +312,15 @@ public class DeviceControlActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.gatt_services, menu);
+        getMenuInflater().inflate(R.menu.menu_gatt_services, menu);
         if (mConnected) {
             menu.findItem(R.id.menu_connect).setVisible(false);
             menu.findItem(R.id.menu_disconnect).setVisible(true);
+            menu.findItem(R.id.menu_go).setVisible(true);
         } else {
             menu.findItem(R.id.menu_connect).setVisible(true);
             menu.findItem(R.id.menu_disconnect).setVisible(false);
+            menu.findItem(R.id.menu_go).setVisible(false);
         }
         return true;
     }
@@ -321,6 +336,10 @@ public class DeviceControlActivity extends Activity {
                 return true;
             case android.R.id.home:
                 onBackPressed();
+                return true;
+            case R.id.menu_go:
+                Intent i = new Intent(DeviceControlActivity.this, MainActivity.class);
+                startActivity(i);
                 return true;
         }
         return super.onOptionsItemSelected(item);
