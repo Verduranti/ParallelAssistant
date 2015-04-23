@@ -5,20 +5,113 @@
     android:background="#FFFFFF" >
 
     <TextView
+        android:id="@+id/textSplashTop"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:textSize="30dp"
-        android:textColor="#454545"
+        android:layout_marginTop="80dp"
+        android:textSize="45sp"
+        android:textColor="#000000"
         android:gravity="center_horizontal"
-        android:layout_alignParentTop="true"
-        android:text="Parking just got easier" />
+        android:text="Hi! I&apos;m"
+        />
 
-    <ImageView
-        android:id="@+id/imgLogo"
-        android:layout_width="wrap_content"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/logoSpread"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:src="@drawable/inteledison" />
+        android:layout_marginBottom="20sp"
+        android:layout_below="@id/textSplashTop">
+        <LinearLayout
+            android:background="#FFFFFF"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+        <LinearLayout
+            android:background="#FFFFFF"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="8">
+            <ImageView
+                android:id="@+id/imgLogo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/black_over_white_logo"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:background="#FFFFFF"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/barSpread"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30sp"
+        android:layout_below="@id/logoSpread" >
+
+        <LinearLayout
+            android:background="#FFFFFF"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:background="#FFFFFF"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="8" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView"
+                android:src="@drawable/black_horiz_line"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:background="#FFFFFF"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_below="@id/logoSpread"
+        android:id="@+id/textSplashBottom"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30sp"
+        android:textSize="35sp"
+        android:background="#FFFFFF"
+        android:textColor="#000000"
+        android:gravity="center_horizontal"
+        android:text="Your personal"
+        android:textIsSelectable="true" />
+
+    <TextView
+        android:layout_below="@id/textSplashBottom"
+        android:id="@+id/textSplashBottom2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10sp"
+        android:textSize="35sp"
+        android:background="#FFFFFF"
+        android:textColor="#000000"
+        android:gravity="center_horizontal"
+        android:text="parking assistant."
+        android:textIsSelectable="true" />
+
+
 
 </RelativeLayout>

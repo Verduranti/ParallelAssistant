@@ -2,8 +2,10 @@ package com.intel.iot.autobackupcamera;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.TextView;
 
 /**
  * Created by verduranti on 2/12/15.
@@ -11,12 +13,20 @@ import android.os.Handler;
 public class SplashScreen extends Activity {
 
     // Splash screen timer
-    private static int SPLASH_TIME_OUT = 2000;
+    private static int SPLASH_TIME_OUT = 20000; //3 seconds
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        TextView tv = (TextView) findViewById(R.id.textSplashTop);
+        Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/CenturyGothicStdRegular.otf");
+        tv.setTypeface(tf, 1);
+        tv = (TextView) findViewById(R.id.textSplashBottom);
+        tv.setTypeface(tf);
+        tv = (TextView) findViewById(R.id.textSplashBottom2);
+        tv.setTypeface(tf);
 
         new Handler().postDelayed(new Runnable() {
 
