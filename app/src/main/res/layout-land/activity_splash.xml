@@ -5,7 +5,7 @@
     android:background="#FFFFFF" >
 
     <TextView
-        android:id="@+id/splashTopText"
+        android:id="@+id/textSplashTop"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -20,7 +20,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/splashTopText">
+        android:layout_below="@id/textSplashTop">
         <LinearLayout
             android:background="#FFFFFF"
             android:layout_width="0dp"
@@ -47,7 +47,7 @@
 
     <TextView
         android:layout_below="@id/logoSpread"
-        android:id="@+id/splashBottomText"
+        android:id="@+id/textSplashBottom"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"

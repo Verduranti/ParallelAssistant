@@ -3,6 +3,7 @@ package com.intel.iot.autobackupcamera;
 import android.app.Activity;
 import android.media.MediaExtractor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,13 +31,22 @@ public class WebViewVideoActivity extends Activity {
         }
     }
 
+    private class MyChrome extends WebChromeClient {
+        @Override
+        public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+            Log.i("WebView", consoleMessage.toString());
+            return super.onConsoleMessage(consoleMessage);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //field = (EditText)findViewById(R.id.urlField);
         browser = (WebView)findViewById(R.id.webView);
-        browser.setWebViewClient(new MyBrowser());
+        //browser.setWebViewClient(new MyBrowser());
+        browser.setWebChromeClient(new MyChrome());
         open();
     }
 
@@ -44,11 +54,11 @@ public class WebViewVideoActivity extends Activity {
         //String url = "http://192.168.1.6/";
         String url = "http://192.168.42.1:8080";
         //String url = "http://192.168.42.1/";
-        browser.getSettings().setLoadsImagesAutomatically(true);
+        //browser.getSettings().setLoadsImagesAutomatically(true);
         browser.getSettings().setJavaScriptEnabled(true);
-        browser.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        //browser.getSettings().setAppCacheEnabled(false);
+        //browser.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         browser.loadUrl(url);
-
     }
 
     @Override

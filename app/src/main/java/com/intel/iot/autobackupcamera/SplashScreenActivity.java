@@ -13,7 +13,7 @@ import android.widget.TextView;
 public class SplashScreenActivity extends Activity {
 
     // Splash screen timer
-    private static int SPLASH_TIME_OUT = 10000; //3 seconds
+    private static int SPLASH_TIME_OUT = 3000; //3 seconds
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,9 @@ public class SplashScreenActivity extends Activity {
         tv = (TextView) findViewById(R.id.textSplashBottom);
         tv.setTypeface(tf);
         tv = (TextView) findViewById(R.id.textSplashBottom2);
-        tv.setTypeface(tf);
+        if(tv != null) {
+            tv.setTypeface(tf);
+        }
 
         new Handler().postDelayed(new Runnable() {
 

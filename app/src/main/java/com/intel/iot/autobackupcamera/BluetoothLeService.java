@@ -43,6 +43,9 @@ import java.util.UUID;
 public class BluetoothLeService extends Service {
     private final static String TAG = BluetoothLeService.class.getSimpleName();
 
+    // Rainier : 98:4F:EE:03:80:59
+    // Sapphire: 98:4F:EE:03:83:24
+
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
     private String mBluetoothDeviceAddress;
