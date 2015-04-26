@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -17,6 +19,8 @@ public class WebViewVideoActivity extends Activity {
 
     //private MediaCodecWrapper mCodecWrapper; //see example
     private MediaExtractor mExtractor = new MediaExtractor();
+
+    private MenuItem refresh;
 
     private class MyBrowser extends WebViewClient {
         @Override
@@ -51,6 +55,20 @@ public class WebViewVideoActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        refresh = menu.findItem(R.id.menu_refresh);
+        refresh.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                browser.reload();
+                return false;
+            }
+        });
+
+        menu.findItem(R.id.menu_stop).setVisible(false);
+        menu.findItem(R.id.menu_scan).setVisible(false);
+        refresh.setActionView(null);
+
         return true;
     }
 
