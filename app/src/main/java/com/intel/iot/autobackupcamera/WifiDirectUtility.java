@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Created by verduranti on 3/20/15.
@@ -52,7 +53,6 @@ public class WifiDirectUtility {
         mPeerListListener = new DirectWifiPeersListener();
         mGroupInfoListener = new DirectWifiGroupInfoListener();
 
-        //mManager.requestGroupInfo(mChannel, mGroupInfoListener);
         mActivity.registerReceiver(mWifiReceiver, makeWifiDirectIntentFilter());
     }
 
@@ -198,7 +198,8 @@ public class WifiDirectUtility {
             mConnected = false;
             if(group != null)
             {
-                Collection<WifiP2pDevice> groupColl = group.getClientList();
+                Collection<WifiP2pDevice> groupColl = new HashSet(group.getClientList());
+                groupColl.add(group.getOwner());
                 for(WifiP2pDevice device : groupColl) {
                     Log.i(TAG, device.deviceName);
                     if (device.deviceName.equals("sapphire")) {
