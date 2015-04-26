@@ -3,9 +3,13 @@ package com.intel.iot.autobackupcamera;
 import android.app.Activity;
 import android.media.MediaExtractor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -17,6 +21,7 @@ public class VideoFeedActivity extends Activity implements ParallelConnectionLis
 
     //private EditText field;
     private WebView browser;
+    private MenuItem refresh;
 
     //private MediaCodecWrapper mCodecWrapper; //see example
     private MediaExtractor mExtractor = new MediaExtractor();
@@ -38,6 +43,14 @@ public class VideoFeedActivity extends Activity implements ParallelConnectionLis
 
     }
 
+    private class MyChrome extends WebChromeClient {
+        @Override
+        public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+            Log.i("WebView", consoleMessage.toString());
+            return super.onConsoleMessage(consoleMessage);
+        }
+    }
+
     private class MyBrowser extends WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -56,12 +69,35 @@ public class VideoFeedActivity extends Activity implements ParallelConnectionLis
 
         //Connect to the device via bluetooth. Ask it to wake up the wifi.
 
-
         //field = (EditText)findViewById(R.id.urlField);
         browser = (WebView)findViewById(R.id.webView);
         browser.setWebViewClient(new MyBrowser());
+        browser.setWebChromeClient(new MyChrome());
+        ViewGroup.LayoutParams lp = browser.getLayoutParams();
+        int lpHeight = lp.height;
+        int lpWidth = lp.width;
+        if(3*lpWidth > 4*lpHeight) {
+            lp.width = 4*lpHeight/3;
+        }
+        else {
+            lp.height = 3*lpWidth/4;
+        }
+        browser.setLayoutParams(lp);
         open();
     }
+
+    protected void onResume() {
+        super.onResume();
+        //Restart if not connected
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //mBLEUtility.pauseBLEService();
+        //mBLEUtility.pauseWifiDirectService();
+    }
+
 
     public void open(){
         //String url = "http://192.168.1.6/";
@@ -78,6 +114,20 @@ public class VideoFeedActivity extends Activity implements ParallelConnectionLis
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        refresh = menu.findItem(R.id.menu_refresh);
+        refresh.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                browser.reload();
+                return false;
+            }
+        });
+
+        menu.findItem(R.id.menu_stop).setVisible(false);
+        menu.findItem(R.id.menu_scan).setVisible(false);
+        refresh.setActionView(null);
+
         return true;
     }
 

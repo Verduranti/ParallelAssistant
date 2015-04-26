@@ -36,6 +36,11 @@ public class BLEUtility {
     private boolean mConnected = false;
     private String mDeviceAddress;
 
+    private ParallelConnectionListenerManager mListeners;
+
+    //TODO: Move this
+    private WifiDirectUtility mWifiUtil;
+
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
 
@@ -67,6 +72,7 @@ public class BLEUtility {
 
     public void startBLEScan() {
         checkBluetooth();
+        mListeners = new ParallelConnectionListenerManager();
         scanLeDevice(true);
     }
 
@@ -99,7 +105,7 @@ public class BLEUtility {
                     //If the device is the correct one, go ahead and connect to it
                     if(device.getName() == null)
                     {
-                        //Log.e(TAG, "WTF BLE?");
+                        //Not interested in these
                         return;
                     }
                     Log.i(TAG, "Found " + device.getName());
@@ -132,6 +138,7 @@ public class BLEUtility {
         }
     };
 
+    //Must be called after startBLEService
     private void initializeBLEService(IBinder service) {
         mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
         if (!mBluetoothLeService.initialize()) {
@@ -140,16 +147,33 @@ public class BLEUtility {
 
         mActivity.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         // Automatically connects to the device upon successful start-up initialization.
-        mActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mBluetoothLeService.connect(mDeviceAddress);
-
-            }
-        });
-        //mBluetoothLeService.connect(mDeviceAddress);
+//        mActivity.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                mBluetoothLeService.connect(mDeviceAddress);
+//
+//            }
+//        });
+        mBluetoothLeService.connect(mDeviceAddress);
     }
 
+    public void pauseBLEService() {
+        mActivity.unregisterReceiver(mGattUpdateReceiver);
+
+    }
+
+    //TODO: Move this
+    public void pauseWifiDirectService() {
+        mWifiUtil.pauseWifiDirect();
+    }
+
+    public void addListener(ParallelConnectionListener listener) {
+        mListeners.addListener(listener);
+    }
+
+    public void removeListener(ParallelConnectionListener listener) {
+        mListeners.removeListener(listener);
+    }
 
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
@@ -173,7 +197,7 @@ public class BLEUtility {
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                 //displayGattServices(mBluetoothLeService.getSupportedGattServices());
-                Map<UUID, BluetoothGattCharacteristic> blecharMap = new HashMap<>();
+                final Map<UUID, BluetoothGattCharacteristic> blecharMap = new HashMap<>();
                 for(BluetoothGattService serv : mBluetoothLeService.getSupportedGattServices())
                 {
                     Log.i(TAG, serv.getUuid().toString());
@@ -189,22 +213,44 @@ public class BLEUtility {
 
                 readCharacteristic(blecharMap, GattAttributes.ACTIVATE_WIFI);
 
+                //TODO: A bad permanent place for this, but allowing it for now
+                //Get a WifiDirect connection going
+
+                mWifiUtil = new WifiDirectUtility(mActivity);
+                mWifiUtil.addListener(new ParallelConnectionListener() {
+                    @Override
+                    public void connected() {
+                        readCharacteristic(blecharMap, GattAttributes.ACTIVATE_CAMERA);
+                    }
+
+                    @Override
+                    public void disconnected() {
+
+                    }
+
+                    @Override
+                    public void error() {
+
+                    }
+                });
+                mWifiUtil.initializeWifiDirect();
+
+                mListeners.connected();
+
+
+
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 //displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
                 //What to do with data
-                int test = intent.getIntExtra(BluetoothLeService.EXTRA_NAME, -1);
-                if(test == 0 || test == 1)
-                {
-                    Log.i(TAG,"Try to start Wifi P2P - does nothing right now");
+                //int test = intent.getIntExtra(BluetoothLeService.EXTRA_NAME, -1);
+                //if(test == 0 || test == 1)
+                //{
+                    //Log.i(TAG,"Try to start Wifi P2P - does nothing right now");
                     //0: This is where we told the app to activate wifi P2P
                     //1: Where we told the board to try and connect with us
                     //-1: anything else
                     //discoverPeers();
-                }
-                else {
-                    //Do nothing for now
-                }
-
+                //}
             }
         }
     };
