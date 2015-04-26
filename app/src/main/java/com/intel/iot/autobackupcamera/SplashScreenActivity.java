@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.TextView;
 
 /**
@@ -13,7 +14,9 @@ import android.widget.TextView;
 public class SplashScreenActivity extends Activity {
 
     // Splash screen timer
+    private final static String TAG = SplashScreenActivity.class.getSimpleName();
     private static int SPLASH_TIME_OUT = 3000; //3 seconds
+    private BLEUtility mBLEUtility = new BLEUtility(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +33,10 @@ public class SplashScreenActivity extends Activity {
             tv.setTypeface(tf);
         }
 
+        //Go start Bluetooth stuff
+        //Need to add Dagger to get me a reliable Singleton
+        //mBLEUtility.startBLEScan();
+
         new Handler().postDelayed(new Runnable() {
 
             /*
@@ -42,7 +49,8 @@ public class SplashScreenActivity extends Activity {
                 // This method will be executed once the timer is over
                 // Start your app main activity
                 //Intent i = new Intent(SplashScreen.this, MainActivity.class);
-                Intent i = new Intent(SplashScreenActivity.this, DeviceScanActivity.class);
+                Log.i(TAG, "Starting Video Feed");
+                Intent i = new Intent(SplashScreenActivity.this, VideoFeedActivity.class);
                 //Intent i = new Intent(SplashScreen.this, WifiDirectActivity.class);
                 startActivity(i);
 
