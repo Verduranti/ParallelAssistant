@@ -29,18 +29,14 @@ public class GattAttributes {
     public static String APPEARANCE = "00002a01-0000-1000-8000-00805f9b34fb";
     public static String ACTIVATE_WIFI = "f8b67f8a-d10e-4c29-bab7-b604f681bf41";
     public static String ACTIVATE_CAMERA = "e3251ee6-922e-44a7-8b35-4438bfc8a5f5";
-
+    public static String SHUTDOWN = "4de865c5-5f02-4891-b9f1-d2f8e4f6f806";
     public static String ADDRESS_DESCRIPTOR = "e3251ee6-922e-44a7-8b35-4438bfc8a5f6";
-    //public static String TEST = "ffffffff-ffff-ffff-ffff-fffffffffff1";
-    //public static String HEART_RATE_MEASUREMENT = "00002a37-0000-1000-8000-00805f9b34fb";
-    //public static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
 
     static {
         // Services.
         attributes.put("00001800-0000-1000-8000-00805f9b34fb", "Generic Access");
         attributes.put("5b580496-d85f-4cd0-8001-46ff648c706c", "Wake Edison");
-        //attributes.put("0000180d-0000-1000-8000-00805f9b34fb", "Heart Rate Service");
-        //attributes.put("0000180a-0000-1000-8000-00805f9b34fb", "Device Information Service");
+
         // Characteristics.
         attributes.put(BATTERY_LEVEL, "Battery Level");
         attributes.put(DEVICE_NAME, "Device Name");
@@ -48,11 +44,10 @@ public class GattAttributes {
         attributes.put(ACTIVATE_WIFI, "Activate Wifi");
         attributes.put(ACTIVATE_CAMERA, "Activate Camera");
         attributes.put(BATTERY_MEASUREMENT, "Battery Measurement");
+        attributes.put(SHUTDOWN, "Shutdown Parallel Assistant");
 
         //Descriptors.
         attributes.put(ADDRESS_DESCRIPTOR, "Address");
-        //attributes.put(TEST, "TEST");
-        //attributes.put("00002a29-0000-1000-8000-00805f9b34fb", "Manufacturer Name String");
     }
 
     public static String lookup(String uuid, String defaultName) {

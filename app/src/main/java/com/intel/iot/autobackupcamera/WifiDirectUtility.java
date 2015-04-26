@@ -7,6 +7,8 @@ import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 
+//Placeholder right now - fix this
+
 /**
  * Created by verduranti on 3/20/15.
  */
@@ -19,8 +21,8 @@ public class WifiDirectUtility {
     {
         WifiP2pManager mManager = (WifiP2pManager) activity.getSystemService(Context.WIFI_P2P_SERVICE);
 //            //System.out.println("WIfi Manager set here: " + mManager.toString());
-            Channel mChannel = mManager.initialize(activity.getApplicationContext(),
-                    activity.getMainLooper(), null);
+        Channel mChannel = mManager.initialize(activity.getApplicationContext(),
+              activity.getMainLooper(), null);
     }
 
     public void connect(String address, String pin)

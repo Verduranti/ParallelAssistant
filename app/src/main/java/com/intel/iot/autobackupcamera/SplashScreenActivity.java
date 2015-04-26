@@ -10,10 +10,10 @@ import android.widget.TextView;
 /**
  * Created by verduranti on 2/12/15.
  */
-public class SplashScreen extends Activity {
+public class SplashScreenActivity extends Activity {
 
     // Splash screen timer
-    private static int SPLASH_TIME_OUT = 20000; //3 seconds
+    private static int SPLASH_TIME_OUT = 10000; //3 seconds
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +40,7 @@ public class SplashScreen extends Activity {
                 // This method will be executed once the timer is over
                 // Start your app main activity
                 //Intent i = new Intent(SplashScreen.this, MainActivity.class);
-                Intent i = new Intent(SplashScreen.this, DeviceScanActivity.class);
+                Intent i = new Intent(SplashScreenActivity.this, DeviceScanActivity.class);
                 //Intent i = new Intent(SplashScreen.this, WifiDirectActivity.class);
                 startActivity(i);
 

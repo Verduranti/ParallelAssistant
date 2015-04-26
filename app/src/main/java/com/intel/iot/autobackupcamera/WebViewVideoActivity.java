@@ -10,7 +10,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 
-public class MainActivity extends Activity {
+public class WebViewVideoActivity extends Activity {
 
     //private EditText field;
     private WebView browser;

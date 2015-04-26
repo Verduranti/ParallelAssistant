@@ -188,7 +188,7 @@ public class DeviceControlActivity extends Activity {
                 Log.i(TAG, "Succeeded in connection");
                 //NetworkInfo networkInfo = getIntent().getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
                 //System.out.println(networkInfo.toString());
-                Intent i = new Intent(DeviceControlActivity.this, MainActivity.class);
+                Intent i = new Intent(DeviceControlActivity.this, WebViewVideoActivity.class);
                 startActivity(i);
                 // close this activity
                 //finish();
@@ -338,7 +338,7 @@ public class DeviceControlActivity extends Activity {
                 onBackPressed();
                 return true;
             case R.id.menu_go:
-                Intent i = new Intent(DeviceControlActivity.this, MainActivity.class);
+                Intent i = new Intent(DeviceControlActivity.this, WebViewVideoActivity.class);
                 startActivity(i);
                 return true;
         }
