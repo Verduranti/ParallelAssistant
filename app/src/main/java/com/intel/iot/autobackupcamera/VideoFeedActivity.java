@@ -12,8 +12,6 @@ import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 /**
  * Created by verduranti on 3/5/15.
@@ -102,17 +100,6 @@ public class VideoFeedActivity extends Activity implements ParallelConnectionLis
 
         browser.setWebViewClient(new MyBrowser());
         browser.setWebChromeClient(new MyChrome());
-
-        ViewGroup.LayoutParams lp = browser.getLayoutParams();
-        int lpHeight = lp.height;
-        int lpWidth = lp.width;
-        if(3*lpWidth > 4*lpHeight) {
-            lp.width = 4*lpHeight/3;
-        }
-        else {
-            lp.height = 3*lpWidth/4;
-        }
-        browser.setLayoutParams(lp);
         
         open();
     }
