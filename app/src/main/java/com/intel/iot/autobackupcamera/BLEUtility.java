@@ -27,6 +27,8 @@ import java.util.UUID;
  */
 public class BLEUtility {
     private final static String TAG = BLEUtility.class.getSimpleName();
+    public static final String TARGET_SERVICE_NAME = "Parallel Demo S";
+    //public static final String TARGET_SERVICE_NAME = "Parallel Demo";
 
     private BluetoothLeService mBluetoothLeService;
     private Activity mActivity;
@@ -108,12 +110,13 @@ public class BLEUtility {
                         //Not interested in these
                         return;
                     }
-                    Log.i(TAG, "Found " + device.getName());
-                    if(device.getName().equals("Parallel Demo S"))
+                    //Log.i(TAG, "Found " + device.getName());
+                    if(device.getName().equals(TARGET_SERVICE_NAME))
                     {
-                        Log.i(TAG, "Connecting to parallel demo");
+                        Log.v(TAG, "Connecting to parallel demo");
                         mDeviceAddress = device.getAddress();
                         startBLEService();
+                        scanLeDevice(false);
                     }
                 }
             };

@@ -23,6 +23,8 @@ import java.util.HashSet;
  */
 public class WifiDirectUtility {
     private final static String TAG = WifiDirectUtility.class.getSimpleName();
+    public static final String TARGET_DEVICE_NAME = "sapphire";
+    //public static final String TARGET_DEVICE_NAME = "rainier";
 
     private Activity mActivity;
     private WifiP2pManager mManager;
@@ -184,7 +186,7 @@ public class WifiDirectUtility {
             for (WifiP2pDevice peer : peers.getDeviceList()) {
                 Log.i(TAG, "WifiP2P Address: " + peer.deviceAddress);
                 Log.i(TAG, "WifiP2P Name: " + peer.deviceName);
-                if(peer.deviceName.equals("sapphire")) {
+                if(peer.deviceName.equals(TARGET_DEVICE_NAME)) {
                     connect(peer.deviceAddress);
                 }
             }
@@ -202,7 +204,7 @@ public class WifiDirectUtility {
                 groupColl.add(group.getOwner());
                 for(WifiP2pDevice device : groupColl) {
                     Log.i(TAG, device.deviceName);
-                    if (device.deviceName.equals("sapphire")) {
+                    if (device.deviceName.equals(TARGET_DEVICE_NAME)) {
                         mConnected = true;
                         mListeners.connected();
                     }

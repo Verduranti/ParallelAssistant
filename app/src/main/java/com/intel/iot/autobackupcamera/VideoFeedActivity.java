@@ -12,6 +12,8 @@ import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 /**
  * Created by verduranti on 3/5/15.
@@ -59,6 +61,24 @@ public class VideoFeedActivity extends Activity implements ParallelConnectionLis
         }
     }
 
+    private void resizeBrowser() {
+        int width = browser.getWidth();
+        int height = browser.getHeight();
+        if(width*3 > height*4) { // Assume landscape
+            ViewGroup.LayoutParams lp = browser.getLayoutParams();
+            lp.height = height;
+            lp.width = height * 4 / 3;
+            browser.setLayoutParams(lp);
+        }
+        else { // Assume portrait
+            ViewGroup.LayoutParams lp = browser.getLayoutParams();
+            lp.height = width * 3 / 4;
+            lp.width = width;
+            browser.setLayoutParams(lp);
+        }
+        System.out.println(width + " x " + height);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,18 +91,17 @@ public class VideoFeedActivity extends Activity implements ParallelConnectionLis
 
         //field = (EditText)findViewById(R.id.urlField);
         browser = (WebView)findViewById(R.id.webView);
+
+        browser.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                resizeBrowser();
+            }
+        });
+
         browser.setWebViewClient(new MyBrowser());
         browser.setWebChromeClient(new MyChrome());
-        ViewGroup.LayoutParams lp = browser.getLayoutParams();
-        int lpHeight = lp.height;
-        int lpWidth = lp.width;
-        if(3*lpWidth > 4*lpHeight) {
-            lp.width = 4*lpHeight/3;
-        }
-        else {
-            lp.height = 3*lpWidth/4;
-        }
-        browser.setLayoutParams(lp);
+
         open();
     }
 
