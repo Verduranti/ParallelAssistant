@@ -149,7 +149,7 @@ public class WifiDirectUtility {
                 connectionChanged(intent); // 2
                 // Respond to new connection or disconnections
             } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
-                Log.i(TAG, "Wifi P2P Peers Changed");
+                //Log.i(TAG, "Wifi P2P Peers Changed");
                 //connect("fe:c2:de:35:ef:4d", "90583483");
                 mManager.requestPeers(mChannel, mPeerListListener); // 3
             } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
@@ -172,9 +172,12 @@ public class WifiDirectUtility {
         if (networkInfo.isConnected()) {
             //mManager.requestConnectionInfo(mChannel, myConnectionInfoListener);
             Log.i(TAG, "New Connected Network info: " + networkInfo.toString());
+            mListeners.connected();
         } else {
             // It's a disconnect
             Log.i(TAG, "Network disconnected: " + networkInfo.toString());
+            if(!networkInfo.isConnectedOrConnecting())
+                mConnected = false;
         }
 
     }
@@ -184,7 +187,7 @@ public class WifiDirectUtility {
         public void onPeersAvailable(WifiP2pDeviceList peers) {
             Log.i(TAG,"Found peers");
             for (WifiP2pDevice peer : peers.getDeviceList()) {
-                Log.i(TAG, "WifiP2P Address: " + peer.deviceAddress);
+                //Log.i(TAG, "WifiP2P Address: " + peer.deviceAddress);
                 Log.i(TAG, "WifiP2P Name: " + peer.deviceName);
                 if(peer.deviceName.equals(TARGET_DEVICE_NAME)) {
                     connect(peer.deviceAddress);

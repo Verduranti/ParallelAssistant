@@ -46,6 +46,8 @@ public class BLEUtility {
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
 
+    final Map<UUID, BluetoothGattCharacteristic> blecharMap = new HashMap<>();
+
     public BLEUtility(Activity activity) {
         mActivity = activity;
         mHandler = new Handler();
@@ -85,7 +87,7 @@ public class BLEUtility {
                 @Override
                 public void run() {
                     mScanning = false;
-                    mBluetoothAdapter.startLeScan(mLeScanCallback);
+                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
                 }
             }, SCAN_PERIOD);
 
@@ -162,7 +164,10 @@ public class BLEUtility {
 
     public void pauseBLEService() {
         mActivity.unregisterReceiver(mGattUpdateReceiver);
+    }
 
+    public void restartBLEService() {
+        mActivity.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
     }
 
     //TODO: Move this
@@ -200,7 +205,7 @@ public class BLEUtility {
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                 //displayGattServices(mBluetoothLeService.getSupportedGattServices());
-                final Map<UUID, BluetoothGattCharacteristic> blecharMap = new HashMap<>();
+
                 for(BluetoothGattService serv : mBluetoothLeService.getSupportedGattServices())
                 {
                     Log.i(TAG, serv.getUuid().toString());
@@ -266,6 +271,11 @@ public class BLEUtility {
         {
             mBluetoothLeService.readCharacteristic(blechar);
         }
+    }
+
+    //todo: this is desperate for some error handling
+    public void runShutdown() {
+        readCharacteristic(blecharMap, GattAttributes.SHUTDOWN);
     }
 
     private static IntentFilter makeGattUpdateIntentFilter() {

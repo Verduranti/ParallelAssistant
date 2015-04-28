@@ -18,6 +18,7 @@ public class SplashScreenActivity extends Activity {
     private static int SPLASH_TIME_OUT = 3000; //3 seconds
     private BLEUtility mBLEUtility = new BLEUtility(this);
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

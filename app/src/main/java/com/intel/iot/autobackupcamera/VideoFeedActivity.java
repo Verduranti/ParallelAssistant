@@ -24,6 +24,7 @@ public class VideoFeedActivity extends Activity implements ParallelConnectionLis
     //private EditText field;
     private WebView browser;
     private MenuItem refresh;
+    private MenuItem shutdown;
 
     //private MediaCodecWrapper mCodecWrapper; //see example
     private MediaExtractor mExtractor = new MediaExtractor();
@@ -102,18 +103,30 @@ public class VideoFeedActivity extends Activity implements ParallelConnectionLis
         browser.setWebViewClient(new MyBrowser());
         browser.setWebChromeClient(new MyChrome());
 
+        ViewGroup.LayoutParams lp = browser.getLayoutParams();
+        int lpHeight = lp.height;
+        int lpWidth = lp.width;
+        if(3*lpWidth > 4*lpHeight) {
+            lp.width = 4*lpHeight/3;
+        }
+        else {
+            lp.height = 3*lpWidth/4;
+        }
+        browser.setLayoutParams(lp);
+        
         open();
     }
 
     protected void onResume() {
         super.onResume();
         //Restart if not connected
+        mBLEUtility.restartBLEService();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        //mBLEUtility.pauseBLEService();
+        mBLEUtility.pauseBLEService();
         //mBLEUtility.pauseWifiDirectService();
     }
 
@@ -143,8 +156,17 @@ public class VideoFeedActivity extends Activity implements ParallelConnectionLis
             }
         });
 
-        menu.findItem(R.id.menu_stop).setVisible(false);
-        menu.findItem(R.id.menu_scan).setVisible(false);
+        refresh = menu.findItem(R.id.menu_shutdown);
+        refresh.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                mBLEUtility.runShutdown();
+                return false;
+            }
+        });
+
+        //menu.findItem(R.id.menu_stop).setVisible(false);
+        //menu.findItem(R.id.menu_scan).setVisible(false);
         refresh.setActionView(null);
 
         return true;

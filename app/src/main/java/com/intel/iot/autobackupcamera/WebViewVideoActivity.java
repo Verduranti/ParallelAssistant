@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -75,8 +74,8 @@ public class WebViewVideoActivity extends Activity {
             }
         });
 
-        menu.findItem(R.id.menu_stop).setVisible(false);
-        menu.findItem(R.id.menu_scan).setVisible(false);
+        //menu.findItem(R.id.menu_stop).setVisible(false);
+        //menu.findItem(R.id.menu_scan).setVisible(false);
         refresh.setActionView(null);
 
         return true;
